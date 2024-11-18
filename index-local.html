@@ -14,13 +14,23 @@
       vr-mode-ui="enabled: false"
       arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false;"
     >
-      <a-text
-        value="This content will always face you."
-        look-at="[gps-camera]"
-        scale="120 120 120"
-        gps-entity-place="latitude: 10.40265; longitude: 75.50607;"
-      ></a-text>
-      <a-camera gps-camera rotation-reader> </a-camera>
+      <a-entity id="model" gps-entity-place scale="10 10 10" rotation="0 180 0" gltf-model="url(ar.glb)"></a-entity>
+      <a-camera gps-camera rotation-reader></a-camera>
     </a-scene>
+
+    <script>
+      window.onload = () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const model = document.getElementById('model');
+            model.setAttribute('gps-entity-place', `latitude: ${latitude}; longitude: ${longitude};`);
+          });
+        } else {
+          alert('Geolocation is not supported by this browser.');
+        }
+      };
+    </script>
   </body>
 </html>
