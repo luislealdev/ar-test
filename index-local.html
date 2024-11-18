@@ -14,8 +14,19 @@
       vr-mode-ui="enabled: false"
       arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false;"
     >
-      <a-entity id="model" gps-projected-entity-place scale="10 10 10" rotation="0 180 0" gltf-model="url(ar.glb)"></a-entity>
-      <a-camera gps-projected-camera rotation-reader position="0 1.6 0"></a-camera>
+      <a-entity
+        id="model"
+        gps-projected-entity-place
+        scale="10 10 10"
+        rotation="0 180 0"
+        gltf-model="url(ar.glb)"
+      ></a-entity>
+      <a-camera
+        gps-projected-camera
+        rotation-reader
+        position="0 1.6 0"
+        gps-projected-camera
+      ></a-camera>
     </a-scene>
 
     <script>
@@ -24,11 +35,14 @@
           navigator.geolocation.getCurrentPosition((position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
-            const model = document.getElementById('model');
-            model.setAttribute('gps-projected-entity-place', `latitude: ${latitude}; longitude: ${longitude};`);
+            const model = document.getElementById("model");
+            model.setAttribute(
+              "gps-projected-entity-place",
+              `latitude: ${latitude}; longitude: ${longitude};`
+            );
           });
         } else {
-          alert('Geolocation is not supported by this browser.');
+          alert("Geolocation is not supported by this browser.");
         }
       };
     </script>
