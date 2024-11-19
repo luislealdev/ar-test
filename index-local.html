@@ -3,47 +3,75 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>GeoAR.js demo</title>
+    <title>AR sin marcador</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
   </head>
 
-  <body>
+  <body style="margin: 0; overflow: hidden">
     <a-scene
+      embedded
+      arjs="sourceType: webcam; debugUIEnabled: false;"
       vr-mode-ui="enabled: false"
-      arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: false;"
+      renderer="antialias: true; colorManagement: true;"
     >
+      <!-- Luz ambiental -->
+      <a-light type="ambient" intensity="0.6"></a-light>
+      <!-- Luz direccional -->
+      <a-light type="directional" position="1 2 1" intensity="1.5"></a-light>
+
+      <!-- Modelo 3D -->
       <a-entity
         id="model"
-        gps-projected-entity-place
-        scale="10 10 10"
-        rotation="0 180 0"
-        gltf-model="url(ar.glb)"
-      ></a-entity>
-      <a-camera
-        gps-projected-camera
-        rotation-reader
+        gps-entity-place="latitude: 37.7749; longitude: -122.4194;"
+        gltf-model="url(./ar.glb)"
+        scale="2 2 2"
         position="0 1.6 0"
-        gps-projected-camera
-      ></a-camera>
+        look-at="[gps-camera]"
+      ></a-entity>
+
+      <!-- Cámara con GPS -->
+      <a-camera gps-camera rotation-reader></a-camera>
     </a-scene>
 
     <script>
       window.onload = () => {
+        const model = document.getElementById("model");
+
+        // Configurar posición GPS dinámica si está disponible
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            const model = document.getElementById("model");
-            model.setAttribute(
-              "gps-projected-entity-place",
-              `latitude: ${latitude}; longitude: ${longitude};`
-            );
-          });
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+
+              model.setAttribute(
+                "gps-entity-place",
+                `latitude: ${latitude + 0.00001}; longitude: ${longitude};`
+              );
+              console.log(
+                `Modelo colocado en: ${latitude + 0.00001}, ${longitude}`
+              );
+            },
+            (err) => {
+              console.error("Error obteniendo ubicación: ", err);
+              alert(
+                "Error obteniendo ubicación. Usando coordenadas de prueba."
+              );
+            },
+            {
+              enableHighAccuracy: true,
+            }
+          );
         } else {
-          alert("Geolocation is not supported by this browser.");
+          alert("Geolocalización no soportada. Usando coordenadas estáticas.");
         }
+
+        // Coordenadas GPS de prueba para escritorio
+        model.setAttribute(
+          "gps-entity-place",
+          "latitude: 37.7749; longitude: -122.4194;"
+        );
       };
     </script>
   </body>
